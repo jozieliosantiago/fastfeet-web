@@ -1,4 +1,4 @@
-import producer from 'immer';
+import produce from 'immer';
 
 const INITIAL_STATE = {
   token: null,
@@ -7,13 +7,19 @@ const INITIAL_STATE = {
 };
 
 export default function auth(state = INITIAL_STATE, action) {
-  switch (action.type) {
-    case '@auth/SIGN_IN_SUCCESS':
-      return producer(state, (draft) => {
+  return produce(state, (draft) => {
+    switch (action.type) {
+      case '@auth/SIGN_IN_SUCCESS': {
         draft.token = action.payload.token;
         draft.signed = true;
-      });
-    default:
-      return state;
-  }
+        break;
+      }
+      case '@auth/SIGN_OUT': {
+        draft.token = null;
+        draft.signed = false;
+        break;
+      }
+      default:
+    }
+  });
 }
