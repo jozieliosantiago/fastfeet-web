@@ -48,6 +48,7 @@ module.exports = {
     'react-hooks/exhaustive-deps': 'warn',
     'react/jsx-props-no-spreading': 'off',
     'no-param-reassign': 'off',
+    'camelcase': 'off',
   },
   settings: {
     'import/resolver': {
