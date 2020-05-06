@@ -22,6 +22,7 @@ export const Buttons = styled.div`
   padding: 5px 15px;
   box-shadow: 0px 0px 2px #00000026;
   border-radius: 4px;
+  z-index: 1;
 
   button {
     text-align: left;

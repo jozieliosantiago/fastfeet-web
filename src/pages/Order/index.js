@@ -6,7 +6,10 @@ import {
   MdKeyboardArrowRight,
 } from 'react-icons/md';
 import randomColor from '~/helpers/randomColor';
+
 import Options from '~/components/Options';
+import Details from './Details';
+import Modal from '~/components/Modal';
 
 import api from '~/services/api';
 
@@ -32,6 +35,8 @@ export default function Order() {
   const [search, setSearch] = useState('');
   const [orders, setOrders] = useState([]);
   const [limit, setLimit] = useState(20);
+  const [visible, setVisible] = useState(false);
+  const [selected, setSelected] = useState(null);
 
   function userNameAbbreviation(name) {
     const splitName = name.split(' ');
@@ -129,6 +134,11 @@ export default function Order() {
     setSearch('');
   }
 
+  function onSelect(order) {
+    setVisible(true);
+    setSelected(order);
+  }
+
   return (
     <Container>
       <Content>
@@ -191,7 +201,7 @@ export default function Order() {
                     {order.statusInfo.text}
                   </Status>
                 </td>
-                <Options />
+                <Options onSelect={() => onSelect(order)} />
               </tr>
             ))}
           </tbody>
@@ -224,6 +234,10 @@ export default function Order() {
             ))}
           </Limit>
         </Pagination>
+
+        <Modal visible={visible} closeModal={() => setVisible(false)}>
+          <Details details={selected} />
+        </Modal>
       </Content>
     </Container>
   );

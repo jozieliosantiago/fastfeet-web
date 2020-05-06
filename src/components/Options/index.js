@@ -5,15 +5,21 @@ import {
   MdModeEdit,
   MdDeleteForever,
 } from 'react-icons/md';
+import PropTypes from 'prop-types';
 
 import { TableData, Buttons } from './styles';
 
-export default function Options() {
+export default function Options({ onSelect }) {
   const [visible, setVisible] = useState(false);
 
   function handleVisible() {
     const isVisible = visible;
     setVisible(!isVisible);
+  }
+
+  function viewDetails() {
+    handleVisible();
+    onSelect();
   }
 
   return (
@@ -24,7 +30,7 @@ export default function Options() {
 
       {visible && (
         <Buttons>
-          <button type="button">
+          <button onClick={viewDetails} type="button">
             <MdVisibility color="#8e5be8" />
             Visualizar
           </button>
@@ -41,3 +47,7 @@ export default function Options() {
     </TableData>
   );
 }
+
+Options.propTypes = {
+  onSelect: PropTypes.func.isRequired,
+};

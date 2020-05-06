@@ -42,4 +42,17 @@ export default createGlobalStyle`
   button {
     cursor: pointer;
   }
+
+/* Modal */
+
+  #modal {
+    display: none;
+    justify-content: center;
+    align-items: center;
+    background: #000000c2;
+    position: absolute;
+    width: 100%;
+    top: 0;
+    height: 100vh;
+  }
 `;

@@ -49,6 +49,7 @@ module.exports = {
     'react/jsx-props-no-spreading': 'off',
     'no-param-reassign': 'off',
     'camelcase': 'off',
+    'react/forbid-prop-types': 0,
   },
   settings: {
     'import/resolver': {
