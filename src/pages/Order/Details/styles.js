@@ -16,11 +16,24 @@ export const Container = styled.div`
     margin-top: 4px;
   }
 
+  span {
+    color: #999;
+    font-weight: 300;
+  }
+
   div {
     & + div {
       border-top: solid 1px #eee;
       margin-top: 12px;
       padding-top: 12px;
+    }
+
+    h6 {
+      margin: 25px auto 20px;
+      font-size: 14px;
+      font-weight: 300;
+      color: #999;
+      text-align: center;
     }
 
     img {

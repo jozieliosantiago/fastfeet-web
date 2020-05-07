@@ -3,11 +3,18 @@ import PropTypes from 'prop-types';
 
 import { Container } from './styles';
 
-import signature from '~/assets/img/signature.png';
-
 export default function Details({ details }) {
-  const { recipient } = details;
+  const { recipient, start_date, end_date, signature } = details;
   const { street, number, city, state, zip_code } = recipient;
+  const url = signature ? signature.url : null;
+
+  const startDate = start_date
+    ? new Date(start_date).toLocaleDateString('pt-BR')
+    : null;
+
+  const endDate = end_date
+    ? new Date(end_date).toLocaleDateString('pt-BR')
+    : null;
 
   return (
     <Container>
@@ -25,16 +32,22 @@ export default function Details({ details }) {
       <div>
         <h4>Datas</h4>
         <p>
-          <strong>Retirada: </strong>25/01/2020
+          <strong>Retirada: </strong>
+          {startDate || <span>Não informado</span>}
         </p>
         <p>
-          <strong>Entrega: </strong>25/01/2020
+          <strong>Entrega: </strong>
+          {endDate || <span>Não informado</span>}
         </p>
       </div>
 
       <div>
         <h4>Assinatura do destinatário</h4>
-        <img src={signature} alt="" />
+        {url ? (
+          <img src={`http://${url}`} alt="assinatura" />
+        ) : (
+          <h6>Sem assinatura</h6>
+        )}
       </div>
     </Container>
   );
