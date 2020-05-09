@@ -36,9 +36,10 @@ export const Search = styled.div`
     background: transparent;
     padding-right: 10px;
     border: 0;
+    color: #999;
 
     &::placeholder {
-      color: #999;
+      color: ${lighten(0.2, '#999')};
     }
   }
 
