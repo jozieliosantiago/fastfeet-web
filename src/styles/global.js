@@ -55,5 +55,6 @@ export default createGlobalStyle`
     width: 100%;
     top: 0;
     height: 100vh;
+    z-index: 1;
   }
 `;
