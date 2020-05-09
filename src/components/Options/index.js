@@ -9,7 +9,7 @@ import PropTypes from 'prop-types';
 
 import { TableData, Buttons } from './styles';
 
-export default function Options({ onSelect }) {
+export default function Options({ onSelect, onDelete }) {
   const [visible, setVisible] = useState(false);
 
   function handleVisible() {
@@ -20,6 +20,11 @@ export default function Options({ onSelect }) {
   function viewDetails() {
     handleVisible();
     onSelect();
+  }
+
+  function deleteOrder() {
+    handleVisible();
+    onDelete();
   }
 
   return (
@@ -38,7 +43,7 @@ export default function Options({ onSelect }) {
             <MdModeEdit color="#4d85ee" />
             Editar
           </button>
-          <button type="button">
+          <button onClick={deleteOrder} type="button">
             <MdDeleteForever color="#de3b3b" />
             Excluir
           </button>
@@ -50,4 +55,5 @@ export default function Options({ onSelect }) {
 
 Options.propTypes = {
   onSelect: PropTypes.func.isRequired,
+  onDelete: PropTypes.func.isRequired,
 };

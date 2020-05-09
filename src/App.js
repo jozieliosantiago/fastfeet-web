@@ -1,5 +1,6 @@
 import React from 'react';
 import { PersistGate } from 'redux-persist/integration/react';
+import ReactNotification from 'react-notifications-component';
 import { Provider } from 'react-redux';
 import { Router } from 'react-router-dom';
 
@@ -14,8 +15,9 @@ export default function App() {
     <Provider store={store}>
       <PersistGate persistor={persistor}>
         <Router history={history}>
-          <Routes />
           <GlobalStyle />
+          <ReactNotification />
+          <Routes />
         </Router>
       </PersistGate>
     </Provider>

@@ -1,5 +1,6 @@
 import { createGlobalStyle } from 'styled-components';
 import Roboto from '../assets/fonts/Roboto-Regular.ttf';
+import 'react-notifications-component/dist/theme.css';
 
 export default createGlobalStyle`
   @font-face {

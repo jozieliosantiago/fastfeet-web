@@ -242,3 +242,30 @@ export const Limit = styled.select`
   height: 32px;
   color: #555;
 `;
+
+export const DeleteOrder = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 450px;
+  height: 200px;
+  background: #fff;
+  padding: 25px;
+  border-radius: 4px;
+  box-shadow: 0px 0px 10px #00000033;
+
+  button {
+    margin: 25px 5px 0;
+    padding: 6px;
+    background: #f5f5f5;
+    color: #999;
+    border: 0;
+    border-radius: 4px;
+    font-weight: 300;
+
+    &:hover {
+      background: ${darken(0.1, '#f5f5f5')};
+    }
+  }
+`;

@@ -6,7 +6,7 @@ const modal = document.getElementById('modal');
 
 const div = document.createElement('div');
 
-export default function Modal({ children, visible, closeModal }) {
+export default function Modal({ children, visible, onCacel }) {
   useEffect(() => {
     modal.appendChild(div);
     if (visible) {
@@ -19,7 +19,7 @@ export default function Modal({ children, visible, closeModal }) {
   }, [visible]);
 
   modal.addEventListener('click', (e) => {
-    if (e.target === modal) closeModal();
+    if (e.target === modal) onCacel();
   });
 
   return <>{visible && ReactDOM.createPortal(children, div)}</>;
@@ -28,5 +28,5 @@ export default function Modal({ children, visible, closeModal }) {
 Modal.propTypes = {
   children: PropTypes.element.isRequired,
   visible: PropTypes.bool.isRequired,
-  closeModal: PropTypes.func.isRequired,
+  onCacel: PropTypes.func.isRequired,
 };

@@ -10,6 +10,7 @@ import randomColor from '~/helpers/randomColor';
 import Options from '~/components/Options';
 import Details from './Details';
 import Modal from '~/components/Modal';
+import Notification from '~/helpers/notification';
 
 import api from '~/services/api';
 
@@ -26,6 +27,7 @@ import {
   Pagination,
   PaginationButton,
   Limit,
+  DeleteOrder,
 } from './styles';
 
 const limitPerPage = [10, 20, 50];
@@ -37,6 +39,7 @@ export default function Order() {
   const [limit, setLimit] = useState(20);
   const [visible, setVisible] = useState(false);
   const [selected, setSelected] = useState(null);
+  const [deleteOrder, setDeleteOder] = useState(false);
 
   function userNameAbbreviation(name) {
     const splitName = name.split(' ');
@@ -135,8 +138,49 @@ export default function Order() {
   }
 
   function onSelect(order) {
+    setDeleteOder(false);
     setVisible(true);
     setSelected(order);
+  }
+
+  function onDelete(order) {
+    setVisible(true);
+    setDeleteOder(true);
+    setSelected(order);
+  }
+
+  function reset() {
+    setSelected(null);
+    setVisible(false);
+    setDeleteOder(false);
+  }
+
+  function onCacel() {
+    reset();
+  }
+
+  async function handleDelete() {
+    const notificationMessage = {
+      title: '',
+      message: '',
+      type: '',
+    };
+
+    const response = await api.delete(`/orders/${selected.id}`);
+
+    if (response.status === 200) {
+      setOrders(orders.filter((order) => order.id !== selected.id));
+      notificationMessage.title = 'Sucesso';
+      notificationMessage.message = 'Encomenda excluída!';
+      notificationMessage.type = 'success';
+      Notification(notificationMessage);
+    } else {
+      notificationMessage.title = 'Erro';
+      notificationMessage.message = 'Não foi possível excluir encomenda!';
+      notificationMessage.type = 'danger';
+      Notification(notificationMessage);
+    }
+    reset();
   }
 
   return (
@@ -201,7 +245,10 @@ export default function Order() {
                     {order.statusInfo.text}
                   </Status>
                 </td>
-                <Options onSelect={() => onSelect(order)} />
+                <Options
+                  onSelect={() => onSelect(order)}
+                  onDelete={() => onDelete(order)}
+                />
               </tr>
             ))}
           </tbody>
@@ -235,8 +282,23 @@ export default function Order() {
           </Limit>
         </Pagination>
 
-        <Modal visible={visible} closeModal={() => setVisible(false)}>
-          <Details details={selected} />
+        <Modal visible={visible} onCacel={onCacel}>
+          <>
+            {deleteOrder && (
+              <DeleteOrder>
+                <p>Excluir encomenda?</p>
+                <div>
+                  <button onClick={handleDelete} type="button">
+                    Sim
+                  </button>
+                  <button onClick={onCacel} type="button">
+                    Não
+                  </button>
+                </div>
+              </DeleteOrder>
+            )}
+            {selected && !deleteOrder && <Details details={selected} />}
+          </>
         </Modal>
       </Content>
     </Container>
