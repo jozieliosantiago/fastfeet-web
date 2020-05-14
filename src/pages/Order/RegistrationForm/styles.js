@@ -78,4 +78,8 @@ export const Form = styled.form`
       color: ${lighten(0.2, '#999')};
     }
   }
+
+  .warning {
+    border: solid 1px orange;
+  }
 `;
