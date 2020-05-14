@@ -16,6 +16,8 @@ export default function Modal({ children, visible, onCacel }) {
       modal.setAttribute('style', 'display: none');
       document.body.style.overflow = 'auto';
     }
+
+    modal.style.top = `${window.pageYOffset}px`;
   }, [visible]);
 
   modal.addEventListener('click', (e) => {
