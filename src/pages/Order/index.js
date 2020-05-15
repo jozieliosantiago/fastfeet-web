@@ -42,6 +42,7 @@ export default function Order() {
   const [selected, setSelected] = useState(null);
   const [deleteOrder, setDeleteOder] = useState(false);
   const [registration, setRegistration] = useState(false);
+  const [editeOrder, setEditeOrder] = useState(false);
 
   function userNameAbbreviation(name) {
     const splitName = name.split(' ');
@@ -127,7 +128,7 @@ export default function Order() {
 
   useEffect(() => {
     fetchData();
-  }, [fetchData]);
+  }, [fetchData, registration]);
 
   function handleChange(e) {
     const filter = e.target.value;
@@ -137,6 +138,11 @@ export default function Order() {
 
   function handleClearInput() {
     setSearch('');
+  }
+
+  function handleRegister() {
+    setEditeOrder(false);
+    setRegistration(true);
   }
 
   function onSelect(order) {
@@ -149,6 +155,12 @@ export default function Order() {
     setVisible(true);
     setDeleteOder(true);
     setSelected(order);
+  }
+
+  function onEdit(order) {
+    setSelected(order);
+    setEditeOrder(true);
+    setRegistration(true);
   }
 
   function reset() {
@@ -189,7 +201,11 @@ export default function Order() {
     <Container>
       <Content>
         {registration ? (
-          <RegistrationForm back={() => setRegistration(false)} />
+          <RegistrationForm
+            back={() => setRegistration(false)}
+            edite={editeOrder}
+            order={selected}
+          />
         ) : (
           <>
             <h1>Gerenciando encomendas</h1>
@@ -212,7 +228,7 @@ export default function Order() {
               </Search>
 
               <Create>
-                <button onClick={() => setRegistration(true)} type="button">
+                <button onClick={handleRegister} type="button">
                   + CADASTRAR
                 </button>
               </Create>
@@ -256,6 +272,7 @@ export default function Order() {
                     <Options
                       onSelect={() => onSelect(order)}
                       onDelete={() => onDelete(order)}
+                      onEdit={() => onEdit(order)}
                     />
                   </tr>
                 ))}

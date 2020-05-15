@@ -8,7 +8,7 @@ import notification from '~/helpers/notification';
 
 import { Container, Content, Header, Form } from './styles';
 
-export default function RegistrationForm({ back }) {
+export default function RegistrationForm({ back, edite, order }) {
   const [recipientList, setRecipientList] = useState(null);
   const [deliverymanList, setDeliverymanList] = useState(null);
   const [disable, setDisable] = useState(false);
@@ -30,32 +30,43 @@ export default function RegistrationForm({ back }) {
     notification(notificationMessage);
   }
 
-  useEffect(() => {
-    async function getData() {
-      try {
-        const [
-          recipientListResponse,
-          deliveymanListResponse,
-        ] = await Promise.all([
-          api.get('/recipients'),
-          api.get('/deliveryman'),
-        ]);
+  async function getData() {
+    try {
+      const [
+        recipientListResponse,
+        deliveymanListResponse,
+      ] = await Promise.all([api.get('/recipients'), api.get('/deliveryman')]);
 
-        const { data: recipientData } = recipientListResponse.data;
-        const { data: deliverymanData } = deliveymanListResponse.data;
+      const { data: recipientData } = recipientListResponse.data;
+      const { data: deliverymanData } = deliveymanListResponse.data;
 
-        setRecipientList(recipientData);
-        setDeliverymanList(deliverymanData);
-      } catch (error) {
-        setDisable(true);
-        notification({
-          title: 'Erro',
-          message:
-            'Não foi possível obter as listas de destinatários e entregadores!',
-          type: 'danger',
-        });
-      }
+      setRecipientList(recipientData);
+      setDeliverymanList(deliverymanData);
+    } catch (error) {
+      setDisable(true);
+      notification({
+        title: 'Erro',
+        message:
+          'Não foi possível obter as listas de destinatários e entregadores!',
+        type: 'danger',
+      });
     }
+  }
+
+  useEffect(() => {
+    if (edite) {
+      const {
+        product: productOfOrder,
+        deliveryman: deliverymanOfOrder,
+        recipient: recipientOfOrder,
+      } = order;
+      setRecipient(recipientOfOrder.name);
+      setDeliveryman(deliverymanOfOrder.name);
+      setProduct(productOfOrder);
+    }
+  }, [edite, order]);
+
+  useEffect(() => {
     getData();
   }, []);
 
@@ -98,13 +109,22 @@ export default function RegistrationForm({ back }) {
 
     try {
       setDisable(true);
-      const response = await api.post('/orders', body);
+      let response = '';
+      if (edite) response = await api.put(`/orders/${order.id}`, body);
+      else response = await api.post('/orders', body);
 
       if (response.status === 200) {
-        showNotification('Sucesso', 'Pedido cadastrdo!', 'success');
+        if (edite) {
+          showNotification('Sucesso', 'Pedido atualizado!', 'success');
+          back();
+          return;
+        }
+        showNotification('Sucesso', 'Pedido cadastrado!', 'success');
+
         setRecipient('');
         setDeliveryman('');
         setProduct('');
+        getData();
         setDisable(false);
       }
     } catch (error) {
@@ -241,4 +261,10 @@ export default function RegistrationForm({ back }) {
 
 RegistrationForm.propTypes = {
   back: PropTypes.func.isRequired,
+  order: PropTypes.object,
+  edite: PropTypes.bool.isRequired,
+};
+
+RegistrationForm.defaultProps = {
+  order: null,
 };
