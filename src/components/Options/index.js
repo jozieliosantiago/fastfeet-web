@@ -35,10 +35,12 @@ export default function Options({ onSelect, onDelete, onEdit }) {
 
       {visible && (
         <Buttons>
-          <button onClick={viewDetails} type="button">
-            <MdVisibility color="#8e5be8" />
-            Visualizar
-          </button>
+          {onSelect && (
+            <button onClick={viewDetails} type="button">
+              <MdVisibility color="#8e5be8" />
+              Visualizar
+            </button>
+          )}
           <button onClick={() => onEdit()} type="button">
             <MdModeEdit color="#4d85ee" />
             Editar
@@ -54,7 +56,11 @@ export default function Options({ onSelect, onDelete, onEdit }) {
 }
 
 Options.propTypes = {
-  onSelect: PropTypes.func.isRequired,
+  onSelect: PropTypes.func,
   onDelete: PropTypes.func.isRequired,
   onEdit: PropTypes.func.isRequired,
+};
+
+Options.defaultProps = {
+  onSelect: null,
 };

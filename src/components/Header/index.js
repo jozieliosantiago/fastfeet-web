@@ -25,7 +25,6 @@ export default function Header() {
 
         <NavMenu>
           <NavOption
-            exact
             to="/order"
             activeClassName="active"
             className="nav-option"
@@ -33,7 +32,6 @@ export default function Header() {
             Encomendas
           </NavOption>
           <NavOption
-            exact
             to="/deliverymen"
             activeClassName="active"
             className="nav-option"
