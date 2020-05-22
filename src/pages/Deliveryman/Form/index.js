@@ -5,6 +5,8 @@ import notification from '~/helpers/notification';
 import history from '~/services/history';
 import api from '~/services/api';
 
+import errorMessages from '~/helpers/errorMessages.json';
+
 import { Container, Content, Header, Form, Avatar } from './styles';
 
 export default function RegistrationForm() {
@@ -78,11 +80,14 @@ export default function RegistrationForm() {
       setDisable(false);
       setPreview(null);
     } catch (error) {
-      showNotification(
-        'Erro',
-        'Não foi possível casdastrar entregador!',
-        'danger'
-      );
+      const { data } = error.response;
+      const { error: err } = data;
+
+      const message = err.key
+        ? errorMessages[err.key]
+        : 'Não foi possível casdastrar entregador!';
+
+      showNotification('Erro', message, 'danger');
       setDisable(false);
     }
   }
@@ -147,6 +152,7 @@ export default function RegistrationForm() {
                 id="avatar"
                 accept="image/*"
                 onChange={handleChange}
+                disabled={disable}
               />
             </label>
           </Avatar>
