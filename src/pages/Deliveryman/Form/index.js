@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { MdKeyboardArrowLeft, MdCheck, MdPhotoCamera } from 'react-icons/md';
 import notification from '~/helpers/notification';
 
@@ -97,28 +97,54 @@ export default function RegistrationForm() {
     setPreview(URL.createObjectURL(e.target.files[0]));
   }
 
+  function setDeliverymanData(deliveryman) {
+    const { avatar } = deliveryman;
+    setName(deliveryman.name);
+    setEmail(deliveryman.email);
+    setDeliverymanId(deliveryman.id);
+
+    if (avatar) setPreview(`http://${avatar.url}`);
+    setDisable(false);
+  }
+
+  const getDeliverymanById = useCallback(async (id) => {
+    try {
+      const response = await api.get(`/deliveryman/${id}`);
+      const { data } = response;
+
+      setDeliverymanData(data);
+    } catch (error) {
+      notification({
+        title: 'Erro',
+        message: 'Não foi possível obter dados do entregador!',
+        type: 'danger',
+      });
+    }
+  }, []);
+
   useEffect(() => {
     const { location } = history;
 
     if (location.search) {
+      setDisable(true);
       if (location.state) {
         const { deliveryman } = location.state;
-        const { avatar } = deliveryman;
-
-        setName(deliveryman.name);
-        setEmail(deliveryman.email);
-        setDeliverymanId(deliveryman.id);
-
-        if (avatar) setPreview(`http://${avatar.url}`);
+        setDeliverymanData(deliveryman);
+      } else {
+        getDeliverymanById(location.search.replace('?', ''));
       }
     }
-  }, []);
+  }, [getDeliverymanById]);
 
   return (
     <Container>
       <Content>
         <Header>
-          <h1>Cadastro de entregadores</h1>
+          {deliverymanId ? (
+            <h1>Edição de entregadores</h1>
+          ) : (
+            <h1>Cadastro de entregadores</h1>
+          )}
           <div>
             <button
               onClick={() => history.goBack()}
