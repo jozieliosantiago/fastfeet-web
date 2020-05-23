@@ -4,6 +4,7 @@ import { lighten } from 'polished';
 export const Container = styled.div`
   background: #f5f5f5;
   min-height: calc(100vh - 64px);
+  padding: 34px 30px 0;
 `;
 
 export const Content = styled.div`

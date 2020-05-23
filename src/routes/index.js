@@ -3,7 +3,10 @@ import { Switch } from 'react-router-dom';
 import Route from './Route';
 
 import SignIn from '../pages/SignIn';
+
 import Order from '../pages/Order';
+import OrderForm from '../pages/Order/Form';
+
 import Deliveryman from '../pages/Deliveryman';
 import DeliverymanForm from '../pages/Deliveryman/Form';
 
@@ -11,7 +14,9 @@ export default function Routes() {
   return (
     <Switch>
       <Route path="/" exact component={SignIn} />
-      <Route path="/order" component={Order} isPrivate />
+
+      <Route path="/order" exact component={Order} isPrivate />
+      <Route path="/order/form" exact component={OrderForm} isPrivate />
 
       <Route path="/deliverymen" exact component={Deliveryman} isPrivate />
       <Route

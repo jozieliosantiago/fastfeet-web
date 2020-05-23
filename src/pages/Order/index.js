@@ -11,9 +11,9 @@ import Options from '~/components/Options';
 import Details from './Details';
 import Modal from '~/components/Modal';
 import Notification from '~/helpers/notification';
-import RegistrationForm from './RegistrationForm';
 
 import api from '~/services/api';
+import history from '~/services/history';
 
 import {
   Container,
@@ -41,8 +41,6 @@ export default function Order() {
   const [visible, setVisible] = useState(false);
   const [selected, setSelected] = useState(null);
   const [deleteOrder, setDeleteOder] = useState(false);
-  const [registration, setRegistration] = useState(false);
-  const [editeOrder, setEditeOrder] = useState(false);
 
   function userNameAbbreviation(name) {
     const splitName = name.split(' ');
@@ -128,7 +126,7 @@ export default function Order() {
 
   useEffect(() => {
     fetchData();
-  }, [fetchData, registration]);
+  }, [fetchData]);
 
   function handleChange(e) {
     const filter = e.target.value;
@@ -141,8 +139,7 @@ export default function Order() {
   }
 
   function handleRegister() {
-    setEditeOrder(false);
-    setRegistration(true);
+    history.push('/order/form');
   }
 
   function onSelect(order) {
@@ -158,14 +155,17 @@ export default function Order() {
   }
 
   function onEdit(order) {
-    setSelected(order);
-    setEditeOrder(true);
-    setRegistration(true);
+    history.push({
+      pathname: '/order/form',
+      search: String(order.id),
+      state: {
+        order,
+      },
+    });
   }
 
   function reset() {
     setSelected(null);
-    setVisible(false);
     setDeleteOder(false);
   }
 
@@ -200,133 +200,123 @@ export default function Order() {
   return (
     <Container>
       <Content>
-        {registration ? (
-          <RegistrationForm
-            back={() => setRegistration(false)}
-            edite={editeOrder}
-            order={selected}
-          />
-        ) : (
-          <>
-            <h1>Gerenciando encomendas</h1>
+        <h1>Gerenciando encomendas</h1>
 
-            <SearchCreate>
-              <Search>
-                <div>
-                  {search ? (
-                    <MdClear onClick={handleClearInput} className="clear" />
-                  ) : (
-                    <MdSearch />
-                  )}
-                </div>
-                <input
-                  type="text"
-                  placeholder="Buscar por encomendas"
-                  onChange={handleChange}
-                  value={search}
+        <SearchCreate>
+          <Search>
+            <div>
+              {search ? (
+                <MdClear onClick={handleClearInput} className="clear" />
+              ) : (
+                <MdSearch />
+              )}
+            </div>
+            <input
+              type="text"
+              placeholder="Buscar por encomendas"
+              onChange={handleChange}
+              value={search}
+            />
+          </Search>
+
+          <Create>
+            <button onClick={handleRegister} type="button">
+              + CADASTRAR
+            </button>
+          </Create>
+        </SearchCreate>
+
+        <Table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Destinatário</th>
+              <th>Entregador</th>
+              <th>Cidade</th>
+              <th>Estado</th>
+              <th>Status</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {orders.map((order) => (
+              <tr key={order.id}>
+                <td>#{order.id}</td>
+                <td>{order.recipient.name}</td>
+                <Deliveryman>
+                  <Abbreviation
+                    color={order.color}
+                    className="username-abbreviation"
+                  >
+                    {order.abbreviation}
+                  </Abbreviation>
+                  {order.deliveryman.name}
+                </Deliveryman>
+                <td>{order.recipient.city}</td>
+                <td>{order.recipient.state}</td>
+                <td>
+                  <Status className={order.statusInfo.status}>
+                    <div className="dot" />
+                    {order.statusInfo.text}
+                  </Status>
+                </td>
+                <Options
+                  onSelect={() => onSelect(order)}
+                  onDelete={() => onDelete(order)}
+                  onEdit={() => onEdit(order)}
                 />
-              </Search>
+              </tr>
+            ))}
+          </tbody>
+        </Table>
 
-              <Create>
-                <button onClick={handleRegister} type="button">
-                  + CADASTRAR
-                </button>
-              </Create>
-            </SearchCreate>
+        <Pagination>
+          <PaginationButton
+            onClick={() => fetchData(null, pagination.prevPage)}
+            disabled={!pagination.prevPage}
+            type="button"
+          >
+            <MdKeyboardArrowLeft />
+          </PaginationButton>
+          <span>{pagination.currentPage}</span>
+          <PaginationButton
+            disabled={!pagination.nextPage}
+            type="button"
+            onClick={() => fetchData(null, pagination.nextPage)}
+          >
+            <MdKeyboardArrowRight />
+          </PaginationButton>
+          <Limit
+            defaultValue={limit}
+            onChange={(e) => setLimit(e.target.value)}
+          >
+            {limitPerPage.map((limitOption) => (
+              <option key={limitOption} value={limitOption}>
+                {limitOption}/página
+              </option>
+            ))}
+          </Limit>
+        </Pagination>
 
-            <Table>
-              <thead>
-                <tr>
-                  <th>ID</th>
-                  <th>Destinatário</th>
-                  <th>Entregador</th>
-                  <th>Cidade</th>
-                  <th>Estado</th>
-                  <th>Status</th>
-                  <th>Ações</th>
-                </tr>
-              </thead>
-
-              <tbody>
-                {orders.map((order) => (
-                  <tr key={order.id}>
-                    <td>#{order.id}</td>
-                    <td>{order.recipient.name}</td>
-                    <Deliveryman>
-                      <Abbreviation
-                        color={order.color}
-                        className="username-abbreviation"
-                      >
-                        {order.abbreviation}
-                      </Abbreviation>
-                      {order.deliveryman.name}
-                    </Deliveryman>
-                    <td>{order.recipient.city}</td>
-                    <td>{order.recipient.state}</td>
-                    <td>
-                      <Status className={order.statusInfo.status}>
-                        <div className="dot" />
-                        {order.statusInfo.text}
-                      </Status>
-                    </td>
-                    <Options
-                      onSelect={() => onSelect(order)}
-                      onDelete={() => onDelete(order)}
-                      onEdit={() => onEdit(order)}
-                    />
-                  </tr>
-                ))}
-              </tbody>
-            </Table>
-
-            <Pagination>
-              <PaginationButton
-                onClick={() => fetchData(null, pagination.prevPage)}
-                disabled={!pagination.prevPage}
-                type="button"
-              >
-                <MdKeyboardArrowLeft />
-              </PaginationButton>
-              <span>{pagination.currentPage}</span>
-              <PaginationButton
-                disabled={!pagination.nextPage}
-                type="button"
-                onClick={() => fetchData(null, pagination.nextPage)}
-              >
-                <MdKeyboardArrowRight />
-              </PaginationButton>
-              <Limit
-                defaultValue={limit}
-                onChange={(e) => setLimit(e.target.value)}
-              >
-                {limitPerPage.map((limitOption) => (
-                  <option key={limitOption} value={limitOption}>
-                    {limitOption}/página
-                  </option>
-                ))}
-              </Limit>
-            </Pagination>
-
-            <Modal visible={visible} onCacel={onCacel}>
-              <>
-                {deleteOrder && (
-                  <DeleteOrder>
-                    <p>Excluir encomenda?</p>
-                    <div>
-                      <button onClick={handleDelete} type="button">
-                        Sim
-                      </button>
-                      <button onClick={onCacel} type="button">
-                        Não
-                      </button>
-                    </div>
-                  </DeleteOrder>
-                )}
-                {selected && !deleteOrder && <Details details={selected} />}
-              </>
-            </Modal>
+        <Modal visible={visible} onCacel={onCacel}>
+          <>
+            {deleteOrder && (
+              <DeleteOrder>
+                <p>Excluir encomenda?</p>
+                <div>
+                  <button onClick={handleDelete} type="button">
+                    Sim
+                  </button>
+                  <button onClick={onCacel} type="button">
+                    Não
+                  </button>
+                </div>
+              </DeleteOrder>
+            )}
+            {selected && !deleteOrder && <Details details={selected} />}
           </>
-        )}
+        </Modal>
       </Content>
     </Container>
   );

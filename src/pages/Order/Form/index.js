@@ -1,21 +1,22 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { MdKeyboardArrowLeft, MdCheck } from 'react-icons/md';
-import PropTypes from 'prop-types';
 
 import api from '~/services/api';
+import history from '~/services/history';
 
 import notification from '~/helpers/notification';
 
 import { Container, Content, Header, Form } from './styles';
 
-export default function RegistrationForm({ back, edite, order }) {
+export default function RegistrationForm() {
   const [recipientList, setRecipientList] = useState(null);
   const [deliverymanList, setDeliverymanList] = useState(null);
   const [disable, setDisable] = useState(false);
-  const [recipient, setRecipient] = useState('');
-  const [deliveryman, setDeliveryman] = useState('');
-  const [product, setProduct] = useState('');
+  const [recipientName, setRecipientName] = useState('');
+  const [deliverymanName, setDeliverymanName] = useState('');
+  const [productDescription, setProductDescription] = useState('');
   const [warning, setWarning] = useState(false);
+  const [editOrderId, setEditOrderId] = useState(null);
 
   const notificationMessage = {
     title: '',
@@ -53,18 +54,47 @@ export default function RegistrationForm({ back, edite, order }) {
     }
   }
 
-  useEffect(() => {
-    if (edite) {
-      const {
-        product: productOfOrder,
-        deliveryman: deliverymanOfOrder,
-        recipient: recipientOfOrder,
-      } = order;
-      setRecipient(recipientOfOrder.name);
-      setDeliveryman(deliverymanOfOrder.name);
-      setProduct(productOfOrder);
+  function setOrderData(order) {
+    const { recipient } = order;
+    const { deliveryman } = order;
+
+    setRecipientName(recipient.name);
+    setDeliverymanName(deliveryman.name);
+    setProductDescription(order.product);
+    setDisable(false);
+  }
+
+  const getOrderById = useCallback(async (id) => {
+    try {
+      const response = await api.get(`/orders/${id}`);
+      const { data } = response;
+      setOrderData(data);
+      return data;
+    } catch (error) {
+      notification({
+        title: 'Erro',
+        message: 'Não foi possível obter dados do usuário!',
+        type: 'danger',
+      });
+      return null;
     }
-  }, [edite, order]);
+  }, []);
+
+  useEffect(() => {
+    const { location } = history;
+
+    if (location.search) {
+      setDisable(true);
+      if (location.state) {
+        const { order } = location.state;
+
+        setEditOrderId(order.id);
+        setOrderData(order);
+      } else {
+        getOrderById(location.search.replace('?', ''));
+      }
+    }
+  }, [getOrderById]);
 
   useEffect(() => {
     getData();
@@ -73,18 +103,18 @@ export default function RegistrationForm({ back, edite, order }) {
   async function handleSaveOrder() {
     setWarning(false);
 
-    if (!recipient || !deliveryman || !product) {
+    if (!recipientName || !deliverymanName || !productDescription) {
       setWarning(true);
       showNotification('Atenção', 'Preeencha todos os campos!', 'warning');
       return;
     }
 
     const recipientSelected = recipientList.filter(
-      (value) => value.name.toLowerCase() === recipient.toLowerCase()
+      (value) => value.name.toLowerCase() === recipientName.toLowerCase()
     )[0];
 
     const deliverymanSelected = deliverymanList.filter(
-      (value) => value.name.toLowerCase() === deliveryman.toLowerCase()
+      (value) => value.name.toLowerCase() === deliverymanName.toLowerCase()
     )[0];
 
     if (!recipientSelected) {
@@ -102,7 +132,7 @@ export default function RegistrationForm({ back, edite, order }) {
     }
 
     const body = {
-      product,
+      productDescription,
       recipient_id: recipientSelected.id,
       deliveryman_id: deliverymanSelected.id,
     };
@@ -110,20 +140,21 @@ export default function RegistrationForm({ back, edite, order }) {
     try {
       setDisable(true);
       let response = '';
-      if (edite) response = await api.put(`/orders/${order.id}`, body);
+      if (editOrderId)
+        response = await api.put(`/orders/${setEditOrderId}`, body);
       else response = await api.post('/orders', body);
 
       if (response.status === 200) {
-        if (edite) {
+        if (editOrderId) {
           showNotification('Sucesso', 'Pedido atualizado!', 'success');
-          back();
+          history.goBack();
           return;
         }
         showNotification('Sucesso', 'Pedido cadastrado!', 'success');
 
-        setRecipient('');
-        setDeliveryman('');
-        setProduct('');
+        setRecipientName('');
+        setDeliverymanName('');
+        setProductDescription('');
         getData();
         setDisable(false);
       }
@@ -134,7 +165,7 @@ export default function RegistrationForm({ back, edite, order }) {
   }
 
   async function getRecipientList(e) {
-    setRecipient(e.target.value.trim());
+    setRecipientName(e.target.value.trim());
 
     try {
       const response = await api.get('/recipients', {
@@ -157,7 +188,7 @@ export default function RegistrationForm({ back, edite, order }) {
   }
 
   async function getDeliverymanList(e) {
-    setDeliveryman(e.target.value.trim());
+    setDeliverymanName(e.target.value.trim());
 
     try {
       const response = await api.get('/deliveryman', {
@@ -183,9 +214,17 @@ export default function RegistrationForm({ back, edite, order }) {
     <Container>
       <Content>
         <Header>
-          <h1>Cadastro de encomendas</h1>
+          {editOrderId ? (
+            <h1>Edição de encomendas</h1>
+          ) : (
+            <h1>Cadastro de encomendas</h1>
+          )}
           <div>
-            <button onClick={() => back()} className="back" type="button">
+            <button
+              onClick={() => history.goBack()}
+              className="back"
+              type="button"
+            >
               <MdKeyboardArrowLeft size={20} />
               voltar
             </button>
@@ -205,8 +244,8 @@ export default function RegistrationForm({ back, edite, order }) {
               placeholder="buscar destinatário"
               onChange={getRecipientList}
               disabled={disable}
-              className={`${warning && !recipient ? 'warning' : ''}`}
-              value={recipient}
+              className={`${warning && !recipientName ? 'warning' : ''}`}
+              value={recipientName}
             />
             <datalist id="recipient">
               {recipientList && (
@@ -228,8 +267,8 @@ export default function RegistrationForm({ back, edite, order }) {
               placeholder="buscar entregador"
               onChange={getDeliverymanList}
               disabled={disable}
-              className={`${warning && !deliveryman ? 'warning' : ''}`}
-              value={deliveryman}
+              className={`${warning && !deliverymanName ? 'warning' : ''}`}
+              value={deliverymanName}
             />
             <datalist id="deliveryman">
               {deliverymanList && (
@@ -248,9 +287,9 @@ export default function RegistrationForm({ back, edite, order }) {
               type="text"
               placeholder="produto"
               disabled={disable}
-              value={product}
-              onChange={(e) => setProduct(e.target.value)}
-              className={`${warning && !product ? 'warning' : ''}`}
+              value={productDescription}
+              onChange={(e) => setProductDescription(e.target.value)}
+              className={`${warning && !productDescription ? 'warning' : ''}`}
             />
           </div>
         </Form>
@@ -258,13 +297,3 @@ export default function RegistrationForm({ back, edite, order }) {
     </Container>
   );
 }
-
-RegistrationForm.propTypes = {
-  back: PropTypes.func.isRequired,
-  order: PropTypes.object,
-  edite: PropTypes.bool.isRequired,
-};
-
-RegistrationForm.defaultProps = {
-  order: null,
-};
