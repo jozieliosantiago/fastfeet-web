@@ -39,15 +39,13 @@ export default function Header() {
             Entregadores
           </NavOption>
           <NavOption
-            exact
-            to="/recipients"
+            to="/recipient"
             activeClassName="active"
             className="nav-option"
           >
             Destinatários
           </NavOption>
           <NavOption
-            exact
             to="/problems"
             activeClassName="active"
             className="nav-option"
