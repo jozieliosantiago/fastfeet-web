@@ -1,20 +1,32 @@
-import React from 'react';
+import React, { useEffect, useCallback } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Link } from 'react-router-dom';
 
 import { signOut } from '~/store/modules/auth/actions';
+import api from '~/services/api';
 
 import { Container, Content, UserInfo, NavMenu, NavOption } from './styles';
 import logo from '~/assets/img/logo.png';
 
 export default function Header() {
   const { user } = useSelector((state) => state.user);
-  const { name, email } = user;
   const dispatch = useDispatch();
 
-  function handleSignOut() {
+  const handleSignOut = useCallback(() => {
     dispatch(signOut());
-  }
+  }, [dispatch]);
+
+  useEffect(() => {
+    async function validateToken() {
+      try {
+        await api.get('/validate/token');
+      } catch (error) {
+        handleSignOut();
+      }
+    }
+
+    validateToken();
+  }, [handleSignOut]);
 
   return (
     <Container>
@@ -55,8 +67,12 @@ export default function Header() {
         </NavMenu>
 
         <UserInfo>
-          <span>{name}</span>
-          <small>{email}</small>
+          {user && (
+            <>
+              <span>{user.name || ''}</span>
+              <small>{user.email || ''}</small>
+            </>
+          )}
           <button type="button" onClick={handleSignOut}>
             sair do sistema
           </button>
