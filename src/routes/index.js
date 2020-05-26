@@ -13,6 +13,8 @@ import DeliverymanForm from '../pages/Deliveryman/Form';
 import Recipient from '../pages/Recipient';
 import RecipientForm from '../pages/Recipient/Form';
 
+import Problem from '../pages/Problem';
+
 export default function Routes() {
   return (
     <Switch>
@@ -31,6 +33,8 @@ export default function Routes() {
 
       <Route path="/recipient" exact component={Recipient} isPrivate />
       <Route path="/recipient/form" exact component={RecipientForm} isPrivate />
+
+      <Route path="/problem" exact component={Problem} isPrivate />
     </Switch>
   );
 }

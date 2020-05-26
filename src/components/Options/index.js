@@ -9,7 +9,7 @@ import PropTypes from 'prop-types';
 
 import { TableData, Buttons } from './styles';
 
-export default function Options({ onSelect, onDelete, onEdit }) {
+export default function Options({ onSelect, onDelete, onEdit, deleteText }) {
   const [visible, setVisible] = useState(false);
 
   function handleVisible() {
@@ -22,7 +22,7 @@ export default function Options({ onSelect, onDelete, onEdit }) {
     onSelect();
   }
 
-  function deleteOrder() {
+  function handleDelete() {
     handleVisible();
     onDelete();
   }
@@ -41,14 +41,18 @@ export default function Options({ onSelect, onDelete, onEdit }) {
               Visualizar
             </button>
           )}
-          <button onClick={() => onEdit()} type="button">
-            <MdModeEdit color="#4d85ee" />
-            Editar
-          </button>
-          <button onClick={deleteOrder} type="button">
-            <MdDeleteForever color="#de3b3b" />
-            Excluir
-          </button>
+          {onEdit && (
+            <button onClick={() => onEdit()} type="button">
+              <MdModeEdit color="#4d85ee" />
+              Editar
+            </button>
+          )}
+          {onDelete && (
+            <button onClick={handleDelete} type="button">
+              <MdDeleteForever color="#de3b3b" />
+              {deleteText || 'Excluir'}
+            </button>
+          )}
         </Buttons>
       )}
     </TableData>
@@ -57,10 +61,14 @@ export default function Options({ onSelect, onDelete, onEdit }) {
 
 Options.propTypes = {
   onSelect: PropTypes.func,
-  onDelete: PropTypes.func.isRequired,
-  onEdit: PropTypes.func.isRequired,
+  onDelete: PropTypes.func,
+  onEdit: PropTypes.func,
+  deleteText: PropTypes.string,
 };
 
 Options.defaultProps = {
   onSelect: null,
+  onEdit: null,
+  onDelete: null,
+  deleteText: null,
 };

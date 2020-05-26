@@ -46,7 +46,7 @@ export default function Header() {
             Destinatários
           </NavOption>
           <NavOption
-            to="/problems"
+            to="/problem"
             activeClassName="active"
             className="nav-option"
           >
