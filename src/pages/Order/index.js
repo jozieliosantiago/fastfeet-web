@@ -167,6 +167,7 @@ export default function Order() {
   function reset() {
     setSelected(null);
     setDeleteOder(false);
+    setVisible(false);
   }
 
   function onCacel() {
