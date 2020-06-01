@@ -116,7 +116,9 @@ export default function Order() {
       const orderList = data.map((order) => ({
         ...order,
         color: randomColor(),
-        abbreviation: userNameAbbreviation(order.deliveryman.name),
+        abbreviation: order.deliveryman
+          ? userNameAbbreviation(order.deliveryman.name)
+          : userNameAbbreviation('Sem entregador'),
         statusInfo: getStatus(order),
       }));
       setOrders(orderList);
@@ -252,7 +254,9 @@ export default function Order() {
                   >
                     {order.abbreviation}
                   </Abbreviation>
-                  {order.deliveryman.name}
+                  {order.deliveryman
+                    ? order.deliveryman.name
+                    : 'Sem entregador'}
                 </Deliveryman>
                 <td>{order.recipient.city}</td>
                 <td>{order.recipient.state}</td>
