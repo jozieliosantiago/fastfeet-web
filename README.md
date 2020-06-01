@@ -1,11 +1,11 @@
-# GoBarber
+# FastFeet
 
-A Fastfeet é uma aplicação fictícia para o gerenciamento de entrega de pedidos. Essa aplicação faz parte do curso GoStack - Bootcamp da [Rocketseat](https://rocketseat.com.br/).
+A FastFeet é uma aplicação fictícia para o gerenciamento de entrega de pedidos. Essa aplicação faz parte do curso GoStack - Bootcamp da [Rocketseat](https://rocketseat.com.br/).
 
 ![Aplicação em execução](.github/fastfeet.gif "Aplicação em execução")
 
 
-### **Para a execução do projeto é necessária a instalação do [Fastfeet API](https://github.com/jozieliosantiago/fastfeet-api)**
+### **Para a execução do projeto é necessária a instalação do [FastFeet API](https://github.com/jozieliosantiago/fastfeet-api)**
 
 ## Instalação
 
